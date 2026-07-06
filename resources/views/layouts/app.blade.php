@@ -37,6 +37,17 @@
                    class="text-slate-200 hover:text-white hover:bg-slate-800 px-4 py-2 rounded-lg transition">
                     Lista de empleados
                 </a>
+
+                <a href="{{ route('asistencia.historial') }}"
+                    class="text-slate-200 hover:text-white hover:bg-slate-800 px-4 py-2 rounded-lg transition">
+                    Historial
+                </a>
+
+                <a href="{{ route('asistencia.index') }}"
+                    class="text-slate-200 hover:text-white hover:bg-slate-800 px-4 py-2 rounded-lg transition">
+                    Asistencia
+                </a>
+
             </nav>
 
         </div>

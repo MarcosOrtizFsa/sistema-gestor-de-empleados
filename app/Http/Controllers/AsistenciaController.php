@@ -57,4 +57,13 @@ class AsistenciaController extends Controller
         return redirect()->route('asistencia.index')
             ->with('error', 'Este empleado ya registró entrada y salida hoy.');
     }
+
+    public function historial()
+    {
+        $asistencias = Asistencia::with('empleado')
+            ->latest()
+            ->paginate(10);
+
+        return view('asistencias_historial', compact('asistencias'));
+    }
 }

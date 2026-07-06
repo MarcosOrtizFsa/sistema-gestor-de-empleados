@@ -26,4 +26,7 @@ Route::get('/asistencia', [AsistenciaController::class, 'index'])
 Route::post('/asistencia/marcar', [AsistenciaController::class, 'marcar'])
     ->name('asistencia.marcar');
 
+Route::get('/asistencias/historial', [AsistenciaController::class, 'historial'])
+    ->name('asistencia.historial');
 
+    
