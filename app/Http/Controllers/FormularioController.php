@@ -41,7 +41,8 @@ class FormularioController extends Controller
         // Here you would typically save the data to a database or perform other actions
 
         //return view('formulario', ['datos' => $response]);
-        return redirect('/empleados')->with('success', 'Empleado guardado correctamente.');
+        //return redirect('/empleados')->with('success', 'Empleado guardado correctamente.');
+        return view('empleados.create')->with('success', 'Empleado guardado correctamente.');
     }
 
 

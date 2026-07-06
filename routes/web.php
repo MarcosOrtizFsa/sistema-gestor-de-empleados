@@ -7,14 +7,14 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AsistenciaController;
 
 Route::get('/', function () {
-    return view('home');
+    return view('auth.login');
 });
 
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/formulario', function () {
-    return view('formulario');
+    return view('empleados.create');
 });
 
 Route::post('/formulario', [FormularioController::class, 'submit']);

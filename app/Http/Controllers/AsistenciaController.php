@@ -10,7 +10,7 @@ class AsistenciaController extends Controller
 {
     public function index()
     {
-        return view('asistencia');
+        return view('asistencias.marcar');
     }
 
     public function marcar(Request $request)
@@ -64,6 +64,6 @@ class AsistenciaController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('asistencias_historial', compact('asistencias'));
+        return view('asistencias.marcar', compact('asistencias'));
     }
 }
