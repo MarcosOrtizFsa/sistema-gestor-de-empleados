@@ -68,7 +68,8 @@
                     Ingrese sus datos para acceder al sistema.
                 </p>
 
-                <form action="/empleados" method="GET" class="mt-8 space-y-5">
+                <form action="{{ route('login') }}" method="POST" class="mt-8 space-y-5">
+                @csrf
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
