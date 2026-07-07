@@ -1,11 +1,14 @@
 <?php
-
+use Illuminate\Support\Facades\Http;
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\Empleados;
+use Illuminate\Validation\Rule;
 
 new class extends Component {
 
-    public $empleados;
+    use WithPagination;
+    //public $empleados;
 
     public bool $mostrarFormulario = false;
     public ?int $empleadoId = null;
@@ -17,14 +20,51 @@ new class extends Component {
     public $celular;
     public $domicilio;
 
-    public function mount()
+ 
+    public function buscarPorDni()
     {
-        $this->cargarEmpleados();
-    }
+        $this->validate([
+            'dni' => 'required|digits:8',
+        ]);
 
-    public function cargarEmpleados()
-    {
-        $this->empleados = Empleados::latest()->get();
+        try {
+            $response = Http::asForm()
+                ->timeout(10)
+                ->post(config('services.padron.url'), [
+                    'variable_buscar' => $this->dni,
+                ]);
+
+            if (! $response->successful()) {
+                session()->flash('error', 'No se pudo conectar con la API del padrón.');
+                return;
+            }
+
+            $respuesta = $response->json();
+
+            $persona = $respuesta['data'][0] ?? null;
+
+            if (! $persona) {
+                session()->flash('info', 'No se encontraron datos para el DNI ingresado.');
+                return;
+            }
+
+            if (! empty($persona['system_alerta'])) {
+                session()->flash('error', $persona['system_alerta']);
+                return;
+            }
+
+            $this->dni = $persona['system_04_dni'] ?? $this->dni;
+            $this->apellido = $persona['system_04_apellido'] ?? $this->apellido;
+            $this->nombre = $persona['system_04_nombre'] ?? $this->nombre;
+            $this->correo = $persona['system_04_email'] ?? $this->correo;
+            $this->celular = $persona['system_04_celular'] ?? $this->celular;
+            $this->domicilio = $persona['system_04_direccion'] ?? $this->domicilio;
+
+            session()->flash('success', 'Datos obtenidos correctamente desde la API.');
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al consultar la API del padrón.');
+        }
     }
 
     public function nuevo()
@@ -53,10 +93,21 @@ new class extends Component {
         $this->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'dni' => 'nullable|string|max:20',
+
+            'dni' => [
+                'required',
+                'digits:8',
+                Rule::unique('empleados', 'dni')->ignore($this->empleadoId),
+            ],
+
             'correo' => 'nullable|email|max:255',
             'celular' => 'nullable|string|max:50',
             'domicilio' => 'nullable|string|max:255',
+
+        ], [
+            'dni.unique' => 'Ya existe un empleado registrado con ese DNI.',
+            'dni.required' => 'El DNI es obligatorio.',
+            'dni.digits' => 'El DNI debe tener 8 dígitos.',
         ]);
 
         Empleados::updateOrCreate(
@@ -80,7 +131,7 @@ new class extends Component {
 
         $this->limpiarFormulario();
         $this->mostrarFormulario = false;
-        $this->cargarEmpleados();
+        $this->resetPage();
     }
 
     public function cancelar()
@@ -100,6 +151,13 @@ new class extends Component {
             'celular',
             'domicilio',
         ]);
+    }
+
+    public function with()
+    {
+        return [
+            'empleados' => Empleados::orderBy('apellido')->paginate(10),
+        ];
     }
 };
 
@@ -167,9 +225,17 @@ new class extends Component {
                         DNI
                     </label>
 
-                    <input type="text"
-                           wire:model="dni"
-                           class="w-full rounded-xl border-gray-300">
+                        <input type="text"
+                        wire:model="dni"
+                        maxlength="8"
+                        class="w-full rounded-xl border-gray-300"
+                        placeholder="Ingrese DNI">
+
+                    <button type="button"
+                            wire:click="buscarPorDni"
+                            class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl">
+                        Buscar
+                    </button>
 
                     @error('dni')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -327,8 +393,12 @@ new class extends Component {
                     No hay personal registrado.
                 </div>
             @endforelse
-        </div>
 
+            
+        </div>
+        <div class="px-6 py-4 border-t">
+            {{ $empleados->links() }}
+        </div>
     </div>
 
 </div>
