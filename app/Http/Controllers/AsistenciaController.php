@@ -23,7 +23,7 @@ class AsistenciaController extends Controller
         $empleado = Empleados::where('dni', $request->dni)->first();
 
         if (!$empleado) {
-            return redirect()->route('asistencia.index')
+            return redirect()->route('asistencias.index')
                 ->with('error', 'No se encontró un empleado con ese DNI.');
         }
 
@@ -42,7 +42,7 @@ class AsistenciaController extends Controller
                 'estado' => 'Presente',
             ]);
 
-            return redirect()->route('asistencia.index')
+            return redirect()->route('asistencias.index')
                 ->with('success', 'Entrada registrada correctamente para ' . $empleado->nombre . ' ' . $empleado->apellido);
         }
 
@@ -51,11 +51,11 @@ class AsistenciaController extends Controller
                 'hora_salida' => $horaActual,
             ]);
 
-            return redirect()->route('asistencia.index')
+            return redirect()->route('asistencias.index')
                 ->with('success', 'Salida registrada correctamente para ' . $empleado->nombre . ' ' . $empleado->apellido);
         }
 
-        return redirect()->route('asistencia.index')
+        return redirect()->route('asistencias.index')
             ->with('error', 'Este empleado ya registró entrada y salida hoy.');
     }
 

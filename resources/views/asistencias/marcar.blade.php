@@ -29,7 +29,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('asistencia.marcar') }}" method="POST" class="space-y-6">
+            <form action="{{ route('asistencias.marcar') }}" method="POST" class="space-y-6">
                 @csrf
 
                 <div>
