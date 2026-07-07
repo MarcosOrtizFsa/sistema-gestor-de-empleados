@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Empleados;
 use App\Models\Asistencia;
 
+
 class AsistenciaController extends Controller
 {
     public function index()
@@ -58,12 +59,15 @@ class AsistenciaController extends Controller
             ->with('error', 'Este empleado ya registró entrada y salida hoy.');
     }
 
+
     public function historial()
     {
         $asistencias = Asistencia::with('empleado')
-            ->latest()
+            ->latest('fecha')
+            ->latest('hora_entrada')
             ->paginate(10);
 
-        return view('asistencias.marcar', compact('asistencias'));
+        return view('asistencias.historial', compact('asistencias'));
     }
+
 }

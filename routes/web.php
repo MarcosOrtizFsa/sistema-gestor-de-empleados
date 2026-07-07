@@ -5,6 +5,7 @@ use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -13,12 +14,10 @@ Route::get('/', function () {
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/formulario', function () {
-    return view('empleados.create');
-});
+Route::get('/formulario', [FormularioController::class, 'index'])->name('formulario.create');
 
 Route::post('/formulario', [FormularioController::class, 'submit']);
-Route::get('/empleados', [EmpleadosController::class, 'index']);
+Route::get('/empleados', [EmpleadosController::class, 'index'])->name('empleados.index');
 
 Route::get('/asistencia', [AsistenciaController::class, 'index'])
     ->name('asistencia.index');
@@ -29,4 +28,6 @@ Route::post('/asistencia/marcar', [AsistenciaController::class, 'marcar'])
 Route::get('/asistencias/historial', [AsistenciaController::class, 'historial'])
     ->name('asistencia.historial');
 
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard.index');
     

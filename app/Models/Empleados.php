@@ -17,3 +17,5 @@ class Empleados extends Model
             'celular',
         ];
 }
+
+

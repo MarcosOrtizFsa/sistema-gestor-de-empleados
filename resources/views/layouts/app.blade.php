@@ -28,12 +28,12 @@
             </a>
 
             <nav class="flex items-center gap-4">
-                <a href="/formulario"
+                <a href="{{ route('formulario.create') }}"
                    class="text-slate-200 hover:text-white hover:bg-slate-800 px-4 py-2 rounded-lg transition">
                     Nuevo empleado
                 </a>
 
-                <a href="/empleados"
+                <a href="{{ route('empleados.index') }}"
                    class="text-slate-200 hover:text-white hover:bg-slate-800 px-4 py-2 rounded-lg transition">
                     Lista de empleados
                 </a>

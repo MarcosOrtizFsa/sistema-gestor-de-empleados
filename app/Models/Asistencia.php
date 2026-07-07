@@ -21,4 +21,6 @@ class Asistencia extends Model
     {
         return $this->belongsTo(Empleados::class, 'empleado_id');
     }
+
 }
+

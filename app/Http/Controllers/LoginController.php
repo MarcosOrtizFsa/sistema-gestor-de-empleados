@@ -27,7 +27,7 @@ class LoginController extends Controller
             'usuario_nombre' => $usuario->nombre,
         ]);
 
-        return redirect('/empleados');
+        return redirect()->route('dashboard.index');
     }
 
     public function logout()
