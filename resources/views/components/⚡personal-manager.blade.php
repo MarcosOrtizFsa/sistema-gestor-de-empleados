@@ -8,18 +8,21 @@ use Illuminate\Validation\Rule;
 new class extends Component {
 
     use WithPagination;
-    //public $empleados;
 
     public bool $mostrarFormulario = false;
     public ?int $empleadoId = null;
-
+    public string $buscar = '';
     public $nombre;
     public $apellido;
     public $dni;
     public $correo;
     public $celular;
     public $domicilio;
-
+    
+    public function updatedBuscar()
+    {
+        $this->resetPage();
+    }
  
     public function buscarPorDni()
     {
@@ -155,8 +158,22 @@ new class extends Component {
 
     public function with()
     {
+        $query = Empleados::query();
+
+        if ($this->buscar !== '') {
+            $query->where(function ($q) {
+                $q->where('nombre', 'like', '%' . $this->buscar . '%')
+                ->orWhere('apellido', 'like', '%' . $this->buscar . '%')
+                ->orWhere('dni', 'like', '%' . $this->buscar . '%')
+                ->orWhere('correo', 'like', '%' . $this->buscar . '%')
+                ->orWhere('celular', 'like', '%' . $this->buscar . '%');
+            });
+        }
+
         return [
-            'empleados' => Empleados::orderBy('apellido')->paginate(10),
+            'empleados' => $query
+                ->orderBy('apellido')
+                ->paginate(10),
         ];
     }
 };
@@ -192,6 +209,39 @@ new class extends Component {
 
             <form wire:submit="guardar" class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
+                <div class="relative">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        DNI
+                    </label>
+
+                    <input
+                        type="text"
+                        wire:model="dni"
+                        maxlength="8"
+                        class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 pr-14 shadow-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
+                        placeholder="Ingrese DNI">
+
+                    <button
+                        type="button"
+                        wire:click="buscarPorDni"
+                        class="absolute inset-y-0 right-0 flex items-center justify-center px-6 text-gray-500 hover:text-blue-600 transition">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="10 0 5 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            class="w-8 h-8">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+                        </svg>
+
+                    @error('dni')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Nombre
@@ -199,7 +249,7 @@ new class extends Component {
 
                     <input type="text"
                            wire:model="nombre"
-                           class="w-full rounded-xl border-gray-300">
+                           class="w-full rounded-xl border-gray-300 border border-default-medium  py-2">
 
                     @error('nombre')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -213,7 +263,7 @@ new class extends Component {
 
                     <input type="text"
                            wire:model="apellido"
-                           class="w-full rounded-xl border-gray-300">
+                           class="w-full rounded-xl border-gray-300 border border-default-medium  py-2">
 
                     @error('apellido')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -222,22 +272,14 @@ new class extends Component {
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        DNI
+                        Domicilio
                     </label>
 
-                        <input type="text"
-                        wire:model="dni"
-                        maxlength="8"
-                        class="w-full rounded-xl border-gray-300"
-                        placeholder="Ingrese DNI">
+                    <input type="text"
+                           wire:model="domicilio"
+                           class="w-full rounded-xl border-gray-300 border border-default-medium  py-2">
 
-                    <button type="button"
-                            wire:click="buscarPorDni"
-                            class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl">
-                        Buscar
-                    </button>
-
-                    @error('dni')
+                    @error('domicilio')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -249,7 +291,7 @@ new class extends Component {
 
                     <input type="email"
                            wire:model="correo"
-                           class="w-full rounded-xl border-gray-300">
+                           class="w-full rounded-xl border-gray-300 border border-default-medium  py-2">
 
                     @error('correo')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -263,26 +305,14 @@ new class extends Component {
 
                     <input type="text"
                            wire:model="celular"
-                           class="w-full rounded-xl border-gray-300">
+                           class="w-full rounded-xl border-gray-300 border border-default-medium  py-2">
 
                     @error('celular')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        Domicilio
-                    </label>
-
-                    <input type="text"
-                           wire:model="domicilio"
-                           class="w-full rounded-xl border-gray-300">
-
-                    @error('domicilio')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                
 
                 <div class="md:col-span-2 flex flex-col sm:flex-row gap-3 pt-4">
 
@@ -307,10 +337,25 @@ new class extends Component {
 
     <div class="bg-white rounded-2xl shadow overflow-hidden border border-gray-100">
 
-        <div class="border-b px-6 py-4">
-            <h2 class="text-xl font-bold text-gray-800">
-                Listado de Personal
-            </h2>
+        <div class="border-b px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">
+                    Listado de Personal
+                </h2>
+
+                <p class="text-sm text-gray-500">
+                    Busque por nombre, apellido, DNI, correo o celular.
+                </p>
+            </div>
+
+            <div class="w-full md:w-80">
+                <input type="text"
+                    wire:model.live.debounce.500ms="buscar"
+                    class="w-full rounded-xl border-gray-300 border border-default-medium  py-2"
+                    placeholder="Buscar personal...">
+            </div>
+
         </div>
 
         <div class="hidden md:block overflow-x-auto">
